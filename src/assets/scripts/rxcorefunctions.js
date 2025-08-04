@@ -28392,6 +28392,27 @@ function PointFromArcDist(x, y, xc, yc, radius, sang, sweep){
         return selectedmarkup;
     }
 
+    function getTextAnnotationMarkupWithChangingInput(ratio) {
+        var textAnnotationMarkup = {isempty : true};
+        var curmarkupRatio = 0;
+        var curmarkupInitialRatio = 0;
+        var curmarkup
+        for (var i = 0; i < DocObj.markuplist.length; i++) {
+                curmarkup = DocObj.markuplist[i];
+                curmarkupRatio = (curmarkup.h / curmarkup.w).toFixed(6)
+                if (curmarkup.initalHeight != undefined && curmarkup.initalWidth != undefined) {
+                    curmarkupInitialRatio = (curmarkup.initalHeight / curmarkup.initalWidth).toFixed(6)
+                }
+                if(curmarkupRatio == ratio) {
+                    curmarkup.initalHeight = curmarkup.h
+                    curmarkup.initalWidth = curmarkup.w
+                    textAnnotationMarkup = curmarkup;
+                } else if (curmarkupInitialRatio == ratio) {
+                    textAnnotationMarkup = curmarkup;
+                }
+        }
+        return textAnnotationMarkup;
+    }
 
     function ChangeMspaceColorByindx(indx,type){
 
@@ -106077,7 +106098,20 @@ function RxCore_documentTextSearch(text, casesense, wholeword) {
         RxCore_applyAngleLengthSelected(0,radius);
     }
 
-
+    function RxCore_adjustTextAnnotationHeight(w,h,ratio) {
+        var markupobject = getTextAnnotationMarkupWithChangingInput(ratio);
+        if (!markupobject.isempty){
+            if (markupobject.h < h) {
+                var diff = h - markupobject.h;
+                if (diff > 22) {
+                    diff = 15;
+                }
+                markupobject.h = h + diff + 22;
+            } else if (markupobject.h > (h + 37)) {
+                markupobject.h = h
+            }
+        }
+    }
 
     function RxCore_applyWidthHeightSelected(w,h){
         
@@ -136067,6 +136101,7 @@ function getDocRotMousePoint(mousepoint){
         applyAngleLengthSelected : RxCore_applyAngleLengthSelected,
         applyMarkup : RxCore_ApplyMarkup,
         applyRadiusSelected : RxCore_applyRadiusSelected,
+        adjustTextAnnotationHeight : RxCore_adjustTextAnnotationHeight,
         applyWidthHeight : RxCore_applyWidthHeight,
         applyWidthHeightSelected : RxCore_applyWidthHeightSelected,
         attributeMask : RxCore_AttributeMask,

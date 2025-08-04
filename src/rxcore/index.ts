@@ -23,6 +23,10 @@ export class RXCore {
         RxCore.measureArc(onoff);
     }
 
+    public static adjustTextAnnotationHeight(w: number, h: number, ratio: string): void{
+        RxCore.adjustTextAnnotationHeight(w, h, ratio);
+    }
+
     public static birdseyetool(): void {
         RxCore.birdseyetool();
     }
